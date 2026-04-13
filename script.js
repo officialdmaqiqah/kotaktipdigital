@@ -142,18 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.className = `pay-btn ${typeClass}`;
             
             const logoUrl = BANK_LOGOS[bank.type];
-            if (logoUrl) {
-                btn.innerHTML = `
-                    <div class="pay-logo">
-                        <img src="${logoUrl}" alt="${bank.type}" 
-                             onerror="this.style.display='none'; this.parentElement.innerHTML='${bank.type}';"
-                             style="max-height: 25px; max-width: 100px;">
-                    </div>
-                    <span class="pay-sub">KONFIRMASI KE WA</span>
-                `;
-            } else {
-                const logo = BANK_LOGOS[bank.type] || '';
-            const logoHtml = logo ? `<img src="${logo}" alt="${bank.type}" onerror="this.parentElement.innerHTML='${bank.type}'">` : bank.type;
+            const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="${bank.type}" onerror="this.parentElement.innerHTML='${bank.type}'" style="max-height: 25px; max-width: 100px;">` : bank.type;
             
             btn.innerHTML = `
                 <div class="pay-logo">${logoHtml}</div>
