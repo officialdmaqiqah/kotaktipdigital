@@ -228,9 +228,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const { name, description, formattedAmount, method, amount } = currentTransaction;
             const userWa = formatPhoneNumber(waNumberInput.value.trim());
+
+            const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
+            const waUrl = `https://wa.me/${formatPhoneNumber(settings.waNumber)}?text=${encodeURIComponent(message)}`;
+
+            // Open WhatsApp immediately to avoid popup blocker
+            window.open(waUrl, '_blank');
+            paymentModal.style.display = 'none';
             
-            // 1. Save to Supabase History FIRST
-            await saveToCloudHistory({
+            // 1. Save to Supabase History (background)
+            saveToCloudHistory({
                 name,
                 user_wa: userWa,
                 description,
@@ -239,10 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 status: 'pending'
             });
 
-            const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
-            const waUrl = `https://wa.me/${formatPhoneNumber(settings.waNumber)}?text=${encodeURIComponent(message)}`;
-
-            // Automated Notification to Admin via Xsender
+            // 2. Automated Notification to Admin via Xsender (background)
             if (settings.enableXsender && settings.xsenderUrl && settings.xsenderKey) {
                 const adminMessage = `*NOTIFIKASI TRANSFER BARU*\n\nBpk/Ibu *${name}* baru saja melakukan konfirmasi transfer senilai *${formattedAmount}* melalui *${method}*.\n\n*Keterangan:* ${description}\n\nSilakan cek rekening dan konfirmasi di panel Admin.`;
                 
@@ -258,9 +262,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     body: adminParams
                 }).catch(err => console.error('Admin Notification Error:', err));
             }
-
-            window.open(waUrl, '_blank');
-            paymentModal.style.display = 'none';
         });
     }
 
