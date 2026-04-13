@@ -86,8 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = document.createElement('button');
             btn.className = 'pay-btn';
             const logo = BANK_LOGOS[bank.type] || '';
-            btn.innerHTML = logo ? `<div class="pay-logo"><img src="${logo}" style="max-height: 25px;"></div>` : `<div class="pay-logo">${bank.type}</div>`;
-            btn.innerHTML += `<span class="pay-sub">KONFIRMASI KE WA</span>`;
+            const logoHtml = logo ? `<img src="${logo}" alt="${bank.type}" onerror="this.parentElement.innerHTML='${bank.type}'">` : bank.type;
+            
+            btn.innerHTML = `
+                <div class="pay-logo">${logoHtml}</div>
+                <span class="pay-sub">KONFIRMASI KE WA</span>
+            `;
             btn.addEventListener('click', () => handleConfirmation(bank));
             container.appendChild(btn);
         });

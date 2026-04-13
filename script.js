@@ -152,11 +152,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span class="pay-sub">KONFIRMASI KE WA</span>
                 `;
             } else {
-                btn.innerHTML = `
-                    <div class="pay-logo">${bank.type}</div>
-                    <span class="pay-sub">KONFIRMASI KE WA</span>
-                `;
-            }
+                const logo = BANK_LOGOS[bank.type] || '';
+            const logoHtml = logo ? `<img src="${logo}" alt="${bank.type}" onerror="this.parentElement.innerHTML='${bank.type}'">` : bank.type;
+            
+            btn.innerHTML = `
+                <div class="pay-logo">${logoHtml}</div>
+                <span class="pay-sub">KONFIRMASI KE WA</span>
+            `;
             
             btn.addEventListener('click', () => {
                 handleConfirmation(bank);
