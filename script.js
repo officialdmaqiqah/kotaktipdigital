@@ -226,7 +226,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnConfirmPayment.addEventListener('click', async () => {
             if (!currentTransaction) return;
 
-            const { name, userWa, description, formattedAmount, method, amount } = currentTransaction;
+            const userWa = formatPhoneNumber(waNumberInput.value.trim());
+            const description = descriptionInput.value.trim();
             
             // 1. Save to Supabase History FIRST
             await saveToCloudHistory({
@@ -300,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function handleConfirmation(bankObj) {
         const name = nameInput.value.trim();
-        const userWa = waNumberInput.value.trim();
+        const userWa = formatPhoneNumber(waNumberInput.value.trim());
         const description = descriptionInput.value.trim();
         const finalAmount = isCustomAmount ? customAmountInput.value : selectedAmount;
 

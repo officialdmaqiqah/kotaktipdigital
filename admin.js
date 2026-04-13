@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await fetch(settings.xsenderUrl, { method: 'POST', mode: 'no-cors', body: params });
                 showToast('Konfirmasi Terkirim Otomatis!', 'success');
             } else {
-                window.open(`https://wa.me/${item.user_wa}?text=${encodeURIComponent(message)}`, '_blank');
+                window.open(`https://wa.me/${formatPhoneNumber(item.user_wa)}?text=${encodeURIComponent(message)}`, '_blank');
             }
 
             await supabaseClient.from('dukung_history').update({ status: 'confirmed' }).eq('id', id);
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const id = document.getElementById('edit-index').value;
         const payload = {
             name: document.getElementById('edit-name').value.trim(),
-            user_wa: document.getElementById('edit-wa').value.trim(),
+            user_wa: formatPhoneNumber(document.getElementById('edit-wa').value.trim()),
             amount: parseInt(document.getElementById('edit-amount').value),
             description: document.getElementById('edit-description').value.trim()
         };
