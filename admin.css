@@ -531,43 +531,59 @@ td {
         padding-bottom: 80px; /* Space for bottom nav */
     }
 
-    /* Sidebar to Bottom Nav */
+    /* Sidebar to Top Breadcrumb-style Nav */
     .sidebar {
         width: 100%;
         height: auto;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        z-index: 999;
-        flex-direction: row;
-        padding: 10px 16px;
-        background: rgba(17, 24, 39, 0.95);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        justify-content: space-around;
-        align-items: center;
+        position: static;
+        background: transparent;
+        border: none;
+        padding: 10px 0;
+        margin-bottom: 20px;
+        order: -1; /* Ensure it stays at the top */
     }
 
     .sidebar-header {
-        display: none; /* Hide header on mobile bottom nav */
+        display: none;
     }
 
     .sidebar-nav {
         flex-direction: row;
         width: 100%;
-        justify-content: space-around;
+        justify-content: flex-start;
         padding: 0;
-        gap: 0;
+        gap: 15px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding-bottom: 15px;
     }
 
     .nav-item {
-        padding: 8px 12px;
-        text-align: center;
-        flex: 1;
-        font-size: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        padding: 0;
+        background: transparent !important;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: none;
+        position: relative;
+    }
+
+    .nav-item.active {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .nav-item i {
+        font-size: 14px;
+        margin-bottom: 0;
+        margin-right: 5px;
+    }
+
+    /* Add breadcrumb-style separator */
+    .nav-item:not(:last-child)::after {
+        content: ' / ';
+        margin-left: 15px;
+        color: var(--border-color);
+        font-weight: 300;
     }
 
     .nav-item.back-home {
