@@ -135,6 +135,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
         loginInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+        
+        // Auto-login on typing correct password
+        loginInput.addEventListener('input', () => {
+            if (loginInput.value === (settings?.adminPassword || '13551')) {
+                loginBtn.click();
+            }
+        });
     }
 
     function populateUI() {
