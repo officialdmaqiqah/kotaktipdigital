@@ -241,6 +241,43 @@ nav .container {
     color: var(--text-muted);
 }
 
+/* --- Pain Points --- */
+.pain-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.pain-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.pain-icon {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.pain-item h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: var(--text-light);
+}
+
+.pain-item p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+@media (max-width: 968px) {
+    .pain-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .pain-grid { grid-template-columns: 1fr; }
+}
+
 /* --- Pricing Section --- */
 .pricing-grid {
     display: grid;
