@@ -1,4 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- Supabase Configuration ---
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://dhmabsloemxyszurqsgt.supabase.co';
+    const supabaseKey = 'sb_publishable_APhzRoU6KG3Obq_2LI2Dtg_t1Fwf1xD';
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
     // --- Toast Notification Logic ---
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
@@ -33,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnConfirmPayment = document.getElementById('btn-confirm-payment');
 
     let currentTransaction = null;
-
     let selectedAmount = '50000'; // Default
     let isCustomAmount = false;
+    let settings = null;
 
     const BANK_LOGOS = {
         'Mandiri': './assets/logos/mandiri.png',
@@ -49,39 +55,48 @@ document.addEventListener('DOMContentLoaded', () => {
         'LinkAja': './assets/logos/linkaja.png'
     };
 
-    // Load Settings from LocalStorage
-    let settings = JSON.parse(localStorage.getItem('dukungkami_settings')) || {
-        waNumber: '6281234567890',
-        enableUniqueCode: true,
-        xsenderUrl: 'https://xsender.id/send-message',
-        xsenderKey: 'raRmjxN5P9CI7O63PKtFifPhZliRDf',
-        xsenderSender: '6285335150001',
-        enableXsender: true,
-        banks: []
-    };
+    // --- Initialize App & Load Settings from Supabase ---
+    async function initApp() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('dukung_settings')
+                .select('*')
+                .eq('id', 1)
+                .single();
 
-    // Data Migration (Old Object to New Array)
-    if (settings.banks && !Array.isArray(settings.banks)) {
-        const oldBanks = settings.banks;
-        settings.banks = [];
-        Object.keys(oldBanks).forEach(key => {
-            if (oldBanks[key]) {
-                const bankName = key.charAt(0).toUpperCase() + key.slice(1);
-                settings.banks.push({
-                    type: bankName === 'Jago' ? 'Bank Jago' : bankName,
-                    number: oldBanks[key],
-                    holder: 'A.N. Dukung Kami'
-                });
-            }
-        });
+            if (error) throw error;
+
+            // Map Snake Case from DB to Camel Case for existing JS logic
+            settings = {
+                waNumber: data.wa_number,
+                enableUniqueCode: data.enable_unique_code,
+                xsenderUrl: data.xsender_url,
+                xsenderKey: data.xsender_key,
+                xsenderSender: data.xsender_sender,
+                enableXsender: data.enable_xsender,
+                profileImage: data.profile_image,
+                banks: data.banks || []
+            };
+
+            setupProfileImage();
+            renderPaymentMethods();
+        } catch (err) {
+            console.error('Gagal memuat pengaturan dari Cloud:', err);
+            // Fallback default
+            settings = {
+                waNumber: '6281234567890',
+                enableUniqueCode: true,
+                banks: []
+            };
+            renderPaymentMethods();
+        }
     }
 
-    const TARGET_WA_NUMBER = settings.waNumber;
-
-    // Load custom profile image if available
-    const headerProfileImg = document.getElementById('header-profile-img');
-    if (headerProfileImg && settings.profileImage) {
-        headerProfileImg.src = settings.profileImage;
+    function setupProfileImage() {
+        const headerProfileImg = document.getElementById('header-profile-img');
+        if (headerProfileImg && settings.profileImage) {
+            headerProfileImg.src = settings.profileImage;
+        }
     }
 
     // Dynamic Rendering of Payment Methods
@@ -93,11 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
         paymentButtonsContainer.innerHTML = '';
         
         if (!settings.banks || settings.banks.length === 0) {
-            noPaymentMsg.style.display = 'block';
+            if (noPaymentMsg) noPaymentMsg.style.display = 'block';
             return;
         }
 
-        noPaymentMsg.style.display = 'none';
+        if (noPaymentMsg) noPaymentMsg.style.display = 'none';
         settings.banks.forEach((bank) => {
             const btn = document.createElement('button');
             const typeClass = bank.type.toLowerCase().replace('bank ', '').replace(' ', '');
@@ -127,21 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    renderPaymentMethods();
-
     // Handle Amount Selection
     amountButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Update UI
             amountButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
             const value = btn.getAttribute('data-value');
             
             if (value === 'other') {
                 customAmountContainer.style.display = 'block';
                 isCustomAmount = true;
-                selectedAmount = customAmountInput.value;
+                customAmountInput.value = '';
+                selectedAmount = '';
                 customAmountInput.focus();
             } else {
                 customAmountContainer.style.display = 'none';
@@ -151,12 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle Custom Amount Input Change
-    customAmountInput.addEventListener('input', (e) => {
-        if (isCustomAmount) {
-            selectedAmount = e.target.value;
-        }
-    });
+    if (customAmountInput) {
+        customAmountInput.addEventListener('input', (e) => {
+            if (isCustomAmount) {
+                selectedAmount = e.target.value;
+            }
+        });
+    }
 
     // Handle Copy Buttons
     document.querySelectorAll('.copy-btn').forEach(btn => {
@@ -198,14 +211,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle Final Confirmation
     if (btnConfirmPayment) {
-        btnConfirmPayment.addEventListener('click', () => {
+        btnConfirmPayment.addEventListener('click', async () => {
             if (!currentTransaction) return;
 
-            const { name, userWa, description, formattedAmount, method } = currentTransaction;
+            const { name, userWa, description, formattedAmount, method, amount } = currentTransaction;
             
-            const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
+            // 1. Save to Supabase History FIRST
+            await saveToCloudHistory({
+                name,
+                user_wa: userWa,
+                description,
+                amount,
+                method,
+                status: 'pending'
+            });
 
-            const waUrl = `https://wa.me/${TARGET_WA_NUMBER}?text=${encodeURIComponent(message)}`;
+            const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
+            const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent(message)}`;
 
             // Automated Notification to Admin via Xsender
             if (settings.enableXsender && settings.xsenderUrl && settings.xsenderKey) {
@@ -214,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const adminParams = new URLSearchParams();
                 adminParams.append('api_key', settings.xsenderKey);
                 adminParams.append('sender', settings.xsenderSender);
-                adminParams.append('number', TARGET_WA_NUMBER);
+                adminParams.append('number', settings.waNumber);
                 adminParams.append('message', adminMessage);
 
                 fetch(settings.xsenderUrl, {
@@ -229,13 +251,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function saveToHistory(data) {
-        const history = JSON.parse(localStorage.getItem('dukungkami_history')) || [];
-        history.unshift({
-            ...data,
-            timestamp: new Date().toISOString()
-        });
-        localStorage.setItem('dukungkami_history', JSON.stringify(history.slice(0, 100))); // Keep last 100
+    async function saveToCloudHistory(data) {
+        try {
+            const { error } = await supabaseClient
+                .from('dukung_history')
+                .insert([data]);
+            if (error) throw error;
+            console.log('Riwayat berhasil disimpan ke Cloud.');
+        } catch (err) {
+            console.error('Gagal simpan riwayat ke Cloud:', err);
+        }
     }
 
     async function sendXsenderNotification(userData, transactionData, bankData) {
@@ -246,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams();
         params.append('api_key', settings.xsenderKey);
         params.append('sender', settings.xsenderSender);
-        params.append('number', `62${userData.phone}`);
+        params.append('number', userData.phone);
         params.append('message', message);
         params.append('footer', 'Dukung Kami - Konfirmasi Otomatis');
 
@@ -256,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 mode: 'no-cors',
                 body: params
             });
-            console.log('Xsender Notification Sent (Opaque Mode)');
         } catch (err) {
             console.error('Xsender API Error:', err);
         }
@@ -268,32 +292,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const description = descriptionInput.value.trim();
         const finalAmount = isCustomAmount ? customAmountInput.value : selectedAmount;
 
-        // Validation
-        if (!name) {
-            showToast('Silakan masukkan nama lengkap Anda.', 'error');
-            nameInput.focus();
-            return;
-        }
+        if (!name) { showToast('Silakan masukkan nama lengkap Anda.', 'error'); nameInput.focus(); return; }
+        if (!userWa) { showToast('Silakan masukkan nomor WhatsApp Anda.', 'error'); waNumberInput.focus(); return; }
+        if (!description) { showToast('Silakan masukkan keterangan produk/jasa.', 'error'); descriptionInput.focus(); return; }
+        if (!finalAmount || finalAmount <= 0) { showToast('Silakan pilih atau masukkan nominal dukungan.', 'error'); if (isCustomAmount) customAmountInput.focus(); return; }
 
-        if (!userWa) {
-            showToast('Silakan masukkan nomor WhatsApp Anda.', 'error');
-            waNumberInput.focus();
-            return;
-        }
-
-        if (!description) {
-            showToast('Silakan masukkan keterangan produk/jasa.', 'error');
-            descriptionInput.focus();
-            return;
-        }
-
-        if (!finalAmount || finalAmount <= 0) {
-            showToast('Silakan pilih atau masukkan nominal dukungan.', 'error');
-            if (isCustomAmount) customAmountInput.focus();
-            return;
-        }
-
-        // Generate Unique Code (1-50) if enabled in settings
         let uniqueCode = 0;
         const uniqueCodeNotice = document.querySelector('.unique-code-notice');
         
@@ -303,47 +306,31 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             if (uniqueCodeNotice) uniqueCodeNotice.style.display = 'none';
         }
-        
-        const finalAmountWithCode = parseInt(finalAmount) + uniqueCode;
 
-        // Format Currency
+        const totalToPay = parseInt(finalAmount) + uniqueCode;
         const formattedAmount = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0
-        }).format(finalAmountWithCode);
+        }).format(totalToPay);
 
-        // Update Modal UI
-        modalBankName.innerText = bankObj.type;
-        modalAccountNumber.innerText = bankObj.number;
-        const holderEl = document.getElementById('modal-account-holder');
-        if (holderEl) holderEl.innerText = `A.N. ${bankObj.holder}`;
-        modalTotalAmount.innerText = formattedAmount;
-
-        // Save current transaction
         currentTransaction = {
             name,
             userWa,
             description,
-            amount: finalAmountWithCode,
+            amount: totalToPay,
             formattedAmount,
             method: bankObj.type
         };
 
-        // Show Modal
+        modalBankName.textContent = bankObj.type;
+        modalAccountNumber.textContent = bankObj.number;
+        modalTotalAmount.textContent = formattedAmount;
+        const holderEl = document.getElementById('modal-account-holder');
+        if (holderEl) holderEl.textContent = `A.N. ${bankObj.holder}`;
+
         paymentModal.style.display = 'flex';
-
-        // Send Automatic Xsender Notification (Backup)
         sendXsenderNotification({ name, phone: userWa }, currentTransaction, bankObj);
-
-        // Save to History
-        saveToHistory({
-            name,
-            userWa,
-            description,
-            amount: finalAmountWithCode,
-            method: bankObj.type
-        });
     }
 
     // Number only validation for WA input
@@ -352,4 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
     }
+
+    // Start Everything
+    await initApp();
 });
