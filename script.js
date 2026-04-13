@@ -26,6 +26,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     function formatPhoneNumber(num) {
         if (!num) return "";
         let clean = num.toString().replace(/[^0-9]/g, '');
+        
+        // Anti-61 Fix: If number starts with 618 (common mistake), convert to 628
+        if (clean.startsWith('618')) {
+            clean = '62' + clean.slice(2);
+        }
+
         // Aggressive Indonesia normalization
         if (clean.startsWith('0')) {
             clean = '62' + clean.slice(1);
@@ -33,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             clean = '62' + clean;
         }
         // Final check: if it still doesn't start with 62, and it's 8-13 digits, it's probably missing 62
-        if (!clean.startsWith('62') && clean.length >= 9) {
+        if (!clean.startsWith('62') && clean.length >= 9 && clean.length <= 14) {
             clean = '62' + clean;
         }
         return clean;

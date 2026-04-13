@@ -23,8 +23,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Phone Number Normalization ---
     function formatPhoneNumber(num) {
-        if (!num) return num;
+        if (!num) return "";
         let clean = num.toString().replace(/[^0-9]/g, '');
+        
+        // Anti-61 Fix: If number starts with 618 (common mistake), convert to 628
+        if (clean.startsWith('618')) {
+            clean = '62' + clean.slice(2);
+        }
+
         if (clean.startsWith('0')) {
             clean = '62' + clean.slice(1);
         } else if (clean.startsWith('8')) {
