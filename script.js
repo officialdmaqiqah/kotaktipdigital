@@ -24,11 +24,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Phone Number Normalization ---
     function formatPhoneNumber(num) {
-        if (!num) return num;
+        if (!num) return "";
         let clean = num.toString().replace(/[^0-9]/g, '');
+        // Aggressive Indonesia normalization
         if (clean.startsWith('0')) {
             clean = '62' + clean.slice(1);
         } else if (clean.startsWith('8')) {
+            clean = '62' + clean;
+        }
+        // Final check: if it still doesn't start with 62, and it's 8-13 digits, it's probably missing 62
+        if (!clean.startsWith('62') && clean.length >= 9) {
             clean = '62' + clean;
         }
         return clean;
@@ -230,7 +235,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userWa = formatPhoneNumber(waNumberInput.value.trim());
 
             const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
-            const waUrl = `https://wa.me/${formatPhoneNumber(settings.waNumber)}?text=${encodeURIComponent(message)}`;
+            const finalNum = formatPhoneNumber(settings.waNumber);
+            const waUrl = `https://wa.me/${finalNum}?text=${encodeURIComponent(message)}`;
+
+            // Debug Toast (Will help us see what number is being generated)
+            showToast(`Membuka WA ke: ${finalNum}`, 'info');
 
             // Open WhatsApp immediately to avoid popup blocker
             window.open(waUrl, '_blank');
