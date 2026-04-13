@@ -538,9 +538,9 @@ td {
         position: static;
         background: transparent;
         border: none;
-        padding: 10px 0;
-        margin-bottom: 20px;
-        order: -1; /* Ensure it stays at the top */
+        padding: 0;
+        margin-bottom: 15px;
+        order: -1;
     }
 
     .sidebar-header {
@@ -552,38 +552,57 @@ td {
         width: 100%;
         justify-content: flex-start;
         padding: 0;
-        gap: 15px;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-        padding-bottom: 15px;
+        gap: 10px;
+        margin-bottom: 10px;
     }
 
     .nav-item {
         padding: 0;
         background: transparent !important;
         color: var(--text-muted);
-        font-size: 14px;
-        font-weight: 500;
+        font-size: 13px;
+        font-weight: 400;
         box-shadow: none;
-        position: relative;
+        display: inline-flex;
+        align-items: center;
     }
 
     .nav-item.active {
         color: var(--primary);
         font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 4px;
     }
 
     .nav-item i {
-        font-size: 14px;
-        margin-bottom: 0;
-        margin-right: 5px;
+        display: none; /* Hide icons in breadcrumb mode */
     }
 
-    /* Add breadcrumb-style separator */
     .nav-item:not(:last-child)::after {
-        content: ' / ';
-        margin-left: 15px;
-        color: var(--border-color);
-        font-weight: 300;
+        content: ' \203A '; /* Chevron symbol */
+        margin-left: 10px;
+        color: #d1d5db;
+        font-weight: 400;
+        font-size: 16px;
+        text-decoration: none !important;
+    }
+
+    .nav-item.back-home {
+        display: none;
+    }
+
+    /* Content Area Adjustment */
+    .content-header {
+        padding-top: 5px;
+    }
+
+    .content-header h1 {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .content-header p {
+        font-size: 13px;
     }
 
     .nav-item.back-home {
