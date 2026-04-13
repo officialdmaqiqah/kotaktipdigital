@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMO Admin Dashboard - PengenBayar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Admin Login Overlay -->
+    <div id="admin-login-overlay" class="login-overlay">
+        <div class="login-card">
+            <div class="login-avatar-container">
+                <img src="./assets/user-portrait.png" id="login-profile-img" class="login-avatar" alt="Admin">
+            </div>
+            <h3>Panel Admin DEMO</h3>
+            <p>Masukkan password <b>12345</b> untuk mencoba akses.</p>
+            <div class="form-group">
+                <input type="password" id="admin-password-input" class="form-control" placeholder="Password Admin" style="text-align: center; font-size: 18px; letter-spacing: 4px;">
+            </div>
+            <button id="btn-admin-login" class="btn-primary" style="width: 100%; margin-top: 10px;">Buka Kunci</button>
+            <a href="index.html" class="back-link" style="display: block; margin-top: 20px; font-size: 13px; color: #6b7280; text-decoration: none;">← Kembali ke Halaman Utama</a>
+        </div>
+    </div>
+
+    <div class="dashboard-wrapper">
+        <!-- Unified Sticky Navigation Group for Mobile -->
+        <div class="sticky-nav-group">
+            <header class="mobile-top-bar">
+                <div class="brand-info">
+                    <span class="brand-logo">💎</span>
+                    <span class="brand-name">PengenBayar Admin</span>
+                </div>
+                <div class="user-status">Online</div>
+            </header>
+
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <button class="nav-item" data-tab="settings">⚙️ Pengaturan</button>
+                    <button class="nav-item active" data-tab="history">📊 Riwayat</button>
+                </nav>
+            </aside>
+        </div>
+
+        <main class="content">
+            <!-- Settings Tab -->
+            <section id="settings" class="tab-content">
+                <header class="content-header">
+                    <h1>Pengaturan Sistem</h1>
+                    <p>Kelola nomor WhatsApp gateway dan detail rekening tujuan.</p>
+                </header>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>Kontak Admin (Penerima Pesan)</h3>
+                        <div class="form-group">
+                            <label>Nomor WhatsApp Admin (Contoh: 62812...)</label>
+                            <input type="text" id="setting-wa-number" class="form-control" placeholder="6281234567890">
+                            <small>PENTING: Gunakan format internasional (awali 62, jangan 0). Contoh: 6281949098789</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Status Kode Unik</h3>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="enable-unique-code" style="width: 20px; height: 20px;">
+                            <label for="enable-unique-code" style="margin-bottom: 0;">Aktifkan Kode Unik</label>
+                        </div>
+                        <small>Angka acak 1-50 akan ditambahkan pada nominal transfer.</small>
+                    </div>
+
+                    <div class="setting-card" style="opacity: 0.6; filter: grayscale(1);">
+                        <h3>Sistem Otomatisasi (Demo Mode)</h3>
+                        <p style="font-size: 13px; color: #ef4444; margin-bottom: 10px;">Menu ini dinonaktifkan di halaman Demo.</p>
+                        <div class="form-group">
+                            <label>Xsender API Endpoint</label>
+                            <input type="text" class="form-control" value="HIDDEN IN DEMO" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Xsender API Key</label>
+                            <input type="password" class="form-control" value="********" disabled>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" checked disabled style="width: 20px; height: 20px;">
+                            <label style="margin-bottom: 0;">Otomatisasi Server Aktif</label>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Keamanan Admin</h3>
+                        <div class="form-group">
+                            <label>Password Login Admin</label>
+                            <input type="password" id="setting-admin-password" class="form-control" value="12345" disabled>
+                            <small>Password Demo terkunci pada: <b>12345</b></small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Foto Profil / Header</h3>
+                        <div class="form-group" style="text-align: center;">
+                            <div id="admin-photo-preview" style="width: 120px; height: 120px; margin: 0 auto 15px; border-radius: 12px; border: 2px dashed #e5e7eb; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #f9fafb;">
+                                <span style="color: #9ca3af; font-size: 11px;">Belum ada foto</span>
+                            </div>
+                            <input type="file" id="upload-profile-img" accept="image/*" style="display: none;">
+                            <div style="display: flex; justify-content: center; gap: 8px;">
+                                <button type="button" class="btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="document.getElementById('upload-profile-img').click()">Pilih Foto</button>
+                                <button type="button" id="remove-profile-img" class="remove-bank-btn" style="padding: 8px 16px; font-size: 13px; display: none;">Hapus</button>
+                            </div>
+                            <small>Pilih foto (JPG/PNG). Disarankan di bawah 1MB.</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-card" style="grid-column: 1 / -1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 0;">Daftar Rekening / E-Wallet</h3>
+                            <button id="add-bank-btn" class="btn-primary" style="padding: 8px 16px; font-size: 13px;">+ Tambah Rekening</button>
+                        </div>
+                        <div id="bank-list-container">
+                            <!-- Row dinamis akan muncul di sini -->
+                        </div>
+                        <p id="no-banks-msg" style="text-align: center; color: var(--text-muted); padding: 20px; display: none;">Belum ada rekening ditambahkan.</p>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button id="save-settings" class="btn-primary">Simpan Perubahan</button>
+                    <span id="save-status" class="status-msg"></span>
+                </div>
+            </section>
+
+            <!-- History Tab -->
+            <section id="history" class="tab-content active">
+                <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1>Riwayat Pengiriman</h1>
+                        <p>Daftar klik dukungan yang dilakukan oleh pengguna.</p>
+                    </div>
+                    <button id="btn-delete-all-history" class="btn-action btn-delete" style="margin-bottom: 5px; padding: 8px 15px;">Hapus Semua</button>
+                </header>
+
+                <div class="table-container">
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Nama</th>
+                                <th>WhatsApp</th>
+                                <th>Nominal</th>
+                                <th>Metode</th>
+                                <th>Keterangan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- Data populated via JS -->
+                        </tbody>
+                    </table>
+                    <div id="no-history" class="empty-state" style="display: none;">
+                        Belum ada riwayat pengiriman.
+                    </div>
+                </div>
+            <footer class="admin-dashboard-footer" style="text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #9ca3af; line-height: 1.6;">
+                <p>@2026 PengenBayar</p>
+                <p>Developed by <a href="https://www.facebook.com/yahya.kurniawan.1800" target="_blank" style="color: #0d9488; text-decoration: none; font-weight: 600;">Yahya Kurniawan</a></p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div id="edit-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Edit Transaksi</h3>
+                <p>Ubah detail kiriman dukungan ini</p>
+            </header>
+            <div class="modal-body">
+                <input type="hidden" id="edit-index">
+                <div class="form-group">
+                    <label>Nama Pengirim</label>
+                    <input type="text" id="edit-name" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Nomor WhatsApp</label>
+                    <input type="text" id="edit-wa" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Nominal (Rp)</label>
+                    <input type="number" id="edit-amount" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Keterangan</label>
+                    <input type="text" id="edit-description" class="form-control">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button id="btn-save-edit" class="btn-primary" style="flex: 1;">Simpan</button>
+                    <button id="btn-close-edit" class="btn-secondary" style="flex: 1; background: #e5e7eb; color: #374151; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content confirm-modal-content" style="text-align: center;">
+            <div class="confirm-icon" style="width: 60px; height: 60px; background: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; margin: 0 auto 16px; animation: pulse 2s infinite;">!</div>
+            <h3 id="confirm-title" style="margin-bottom: 8px;">Konfirmasi Hapus</h3>
+            <p id="confirm-message" style="color: #6b7280; font-size: 14px; margin-bottom: 24px;">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div style="display: flex; gap: 12px;">
+                <button id="btn-confirm-yes" class="btn-action btn-delete" style="flex: 1; padding: 12px; font-size: 14px;">Ya, Hapus</button>
+                <button id="btn-confirm-no" class="btn-secondary" style="flex: 1; background: #f3f4f6; color: #374151; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer;">Batal</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="demo-admin.js?v=2.1"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PengenBayar - DEMO</title>
+    <meta name="description" content="Halaman Demo PengenBayar - Silakan coba semua fitur secara gratis.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <main class="support-card">
+            <!-- Header Section -->
+            <header class="card-header">
+                <div class="icon-container">
+                    <img src="./assets/user-portrait.png" alt="User Portrait" id="header-profile-img" class="user-avatar">
+                </div>
+                <h1>PengenBayar</h1>
+                <p>Puas dengan layanan kami? Tinggalkan tip terbaik Anda untuk mendukung kami hari ini.</p>
+            </header>
+
+            <!-- Amount Selection Section -->
+            <section class="section">
+                <h2 class="section-title">Pilih Nominal</h2>
+                <div class="amount-grid">
+                    <button class="amount-btn active" data-value="50000">Rp 50rb</button>
+                    <button class="amount-btn" data-value="75000">Rp 75rb</button>
+                    <button class="amount-btn" data-value="100000">Rp 100rb</button>
+                    <button class="amount-btn" data-value="150000">Rp 150rb</button>
+                    <button class="amount-btn" data-value="200000">Rp 200rb</button>
+                    <button class="amount-btn" data-value="other">Lainnya</button>
+                </div>
+                
+                <div id="other-amount-container" class="form-group" style="display: none; margin-top: 15px;">
+                    <label for="custom-amount" class="form-label">Nominal Lainnya (Rp)</label>
+                    <input type="text" id="custom-amount" class="form-control" placeholder="Masukkan nominal...">
+                </div>
+            </section>
+
+            <!-- User Data Section -->
+            <section class="data-section">
+                <h2 class="section-title">Data Pendukung</h2>
+                
+                <div class="form-group">
+                    <label for="full-name" class="form-label">Nama Lengkap *</label>
+                    <input type="text" id="full-name" class="form-control" placeholder="Masukkan nama Anda" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="wa-number" class="form-label">Nomor WhatsApp *</label>
+                    <div class="wa-input-wrapper">
+                        <span class="wa-prefix">+62</span>
+                        <input type="tel" id="wa-number" class="form-control" placeholder="812xxxxxxxx" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">Keterangan *</label>
+                    <textarea id="description" class="form-control" placeholder="Untuk produk/jasa apa?" rows="2" required></textarea>
+                </div>
+            </section>
+
+            <!-- Payment Methods Section -->
+            <section class="payment-section">
+                <h2 class="section-title">Metode Pembayaran</h2>
+                
+                <div class="payment-buttons" id="payment-buttons-container">
+                    <!-- Tombol pembayaran akan di-render secara dinamis dari JS -->
+                </div>
+                <p id="no-payment-msg" style="text-align: center; color: var(--text-muted); font-size: 13px; display: none; margin-top: 20px;">
+                    Metode pembayaran belum tersedia. Silakan hubungi admin.
+                </p>
+            </section>
+
+            <footer class="card-footer-final" style="text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #9ca3af; line-height: 1.6;">
+                <p>@2026 PengenBayar</p>
+                <p>Developed by <a href="https://www.facebook.com/yahya.kurniawan.1800" target="_blank" style="color: #0d9488; text-decoration: none; font-weight: 600;">Yahya Kurniawan</a></p>
+                <p style="margin-top: 8px;"><a href="admin.html" id="admin-entrance" style="text-decoration: none; color: #9ca3af; font-size: 11px; opacity: 0.6;">Admin Menu</a></p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Payment Instructions Modal -->
+    <div id="payment-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+            <div class="modal-header">
+                <h3>Instruksi Pembayaran</h3>
+                <p>Ikuti langkah-langkah berikut untuk konfirmasi</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-steps">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Transfer ke Rekening <strong><span id="modal-bank-name">Bank</span></strong> berikut:</div>
+                    </div>
+
+                    <div class="payment-info-card" style="margin-bottom: 20px;">
+                        <div class="account-row">
+                            <span id="modal-account-number" class="account-number">1234567890</span>
+                            <button class="copy-btn" data-target="modal-account-number">Salin</button>
+                        </div>
+                        <span id="modal-account-holder" class="account-holder">A.N. Dukung Kami</span>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Pastikan Nominal Transfer <strong>HARUS PERSIS</strong> (termasuk kode unik):</div>
+                    </div>
+
+                    <div class="payment-info-card">
+                        <div class="amount-row">
+                            <span id="modal-total-amount" class="total-amount">Rp 50.123</span>
+                            <button class="copy-btn" data-target="modal-total-amount">Salin</button>
+                        </div>
+                        <p class="unique-code-notice">PENTING: Mohon sertakan angka unik ini agar verifikasi manual lebih cepat.</p>
+                    </div>
+
+                    <div class="step-item" style="margin-top: 20px;">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Setelah transfer, klik tombol di bawah untuk <strong>Konfirmasi & Kirim Bukti Transfer</strong> via WhatsApp.</div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button id="btn-confirm-payment" class="btn-confirm">SAYA SUDAH TRANSFER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="demo-script.js?v=2.1"></script>
+</body>
+</html>
