@@ -21,6 +21,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => toast.remove(), 5000);
     }
 
+    // --- Phone Number Normalization ---
+    function formatPhoneNumber(num) {
+        if (!num) return num;
+        let clean = num.toString().replace(/[^0-9]/g, '');
+        if (clean.startsWith('0')) {
+            clean = '62' + clean.slice(1);
+        } else if (clean.startsWith('8')) {
+            clean = '62' + clean;
+        }
+        return clean;
+    }
+
     // --- Custom Confirm Logic ---
     function showConfirm(message, onConfirm) {
         const modal = document.getElementById('confirm-modal');
@@ -222,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }));
 
             const payload = {
-                wa_number: document.getElementById('setting-wa-number').value.trim(),
+                wa_number: formatPhoneNumber(document.getElementById('setting-wa-number').value.trim()),
                 enable_unique_code: document.getElementById('enable-unique-code').checked,
                 xsender_url: document.getElementById('xsender-url').value.trim(),
                 xsender_key: document.getElementById('xsender-key').value.trim(),

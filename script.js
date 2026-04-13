@@ -22,6 +22,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 5000);
     }
 
+    // --- Phone Number Normalization ---
+    function formatPhoneNumber(num) {
+        if (!num) return num;
+        let clean = num.toString().replace(/[^0-9]/g, '');
+        if (clean.startsWith('0')) {
+            clean = '62' + clean.slice(1);
+        } else if (clean.startsWith('8')) {
+            clean = '62' + clean;
+        }
+        return clean;
+    }
+
     const amountButtons = document.querySelectorAll('.amount-btn');
     const customAmountContainer = document.getElementById('other-amount-container');
     const customAmountInput = document.getElementById('custom-amount');
@@ -227,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
-            const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent(message)}`;
+            const waUrl = `https://wa.me/${formatPhoneNumber(settings.waNumber)}?text=${encodeURIComponent(message)}`;
 
             // Automated Notification to Admin via Xsender
             if (settings.enableXsender && settings.xsenderUrl && settings.xsenderKey) {
@@ -273,7 +285,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         params.append('sender', settings.xsenderSender);
         params.append('number', userData.phone);
         params.append('message', message);
-        params.append('footer', 'Dukung Kami - Konfirmasi Otomatis');
+        params.append('footer', 'PengenBayar - Konfirmasi Otomatis');
 
         try {
             await fetch(settings.xsenderUrl, {

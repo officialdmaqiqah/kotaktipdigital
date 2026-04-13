@@ -23,11 +23,12 @@ body {
     background-size: 24px 24px;
     color: var(--text-main);
     line-height: 1.5;
-    min-height: 100vh;
+    min-height: 100dvh; /* Use dynamic viewport height for mobile */
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 20px 15px;
+    overflow-x: hidden;
 }
 
 .page-wrapper {
@@ -555,7 +556,10 @@ body {
 /* Mobile Responsive Optimization */
 @media (max-width: 600px) {
     .page-wrapper {
-        padding: 8px; /* Jarak ke pinggir layar HP */
+        padding: 10px 0; /* Vertical breathing room on mobile */
+        display: flex;
+        align-items: center;
+        min-height: calc(100dvh - 20px);
     }
 
     .support-card {
