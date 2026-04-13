@@ -357,6 +357,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    // Delete All History
+    document.getElementById('btn-delete-all-history')?.addEventListener('click', () => {
+        showConfirm('Hapus SEMUA riwayat secara permanen? Tindakan ini tidak bisa dibatalkan.', async () => {
+            const { error } = await supabaseClient
+                .from('dukung_history')
+                .delete()
+                .neq('id', 0); // Hack to delete all records
+
+            if (error) {
+                showToast('Gagal menghapus semua riwayat.', 'error');
+            } else {
+                await renderHistory();
+                showToast('Semua riwayat telah dibersihkan.', 'success');
+            }
+        });
+    });
+
     window.editTransactionCloud = (id) => {
         const item = historyData.find(h => h.id === id);
         if (!item) return;
