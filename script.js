@@ -188,8 +188,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (customAmountInput) {
         customAmountInput.addEventListener('input', (e) => {
-            if (isCustomAmount) {
-                selectedAmount = e.target.value;
+            // Remove non-digits
+            let rawValue = e.target.value.replace(/[^0-9]/g, '');
+            selectedAmount = rawValue;
+            
+            if (rawValue) {
+                // Format with thousand separators
+                e.target.value = new Intl.NumberFormat('id-ID').format(rawValue);
+            } else {
+                e.target.value = '';
             }
         });
     }
@@ -319,12 +326,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = nameInput.value.trim();
         const userWa = formatPhoneNumber(waNumberInput.value.trim());
         const description = descriptionInput.value.trim();
-        const finalAmount = isCustomAmount ? customAmountInput.value : selectedAmount;
+        
+        // Ensure we use the raw numeric value by stripping non-digits
+        const rawAmount = isCustomAmount ? customAmountInput.value.replace(/[^0-9]/g, '') : selectedAmount.toString().replace(/[^0-9]/g, '');
+        const finalAmount = parseInt(rawAmount) || 0;
 
         if (!name) { showToast('Silakan masukkan nama lengkap Anda.', 'error'); nameInput.focus(); return; }
         if (!userWa) { showToast('Silakan masukkan nomor WhatsApp Anda.', 'error'); waNumberInput.focus(); return; }
         if (!description) { showToast('Silakan masukkan keterangan produk/jasa.', 'error'); descriptionInput.focus(); return; }
-        if (!finalAmount || finalAmount <= 0) { showToast('Silakan pilih atau masukkan nominal dukungan.', 'error'); if (isCustomAmount) customAmountInput.focus(); return; }
+        if (finalAmount <= 0) { showToast('Silakan pilih atau masukkan nominal dukungan.', 'error'); if (isCustomAmount) customAmountInput.focus(); return; }
 
         let uniqueCode = 0;
         const uniqueCodeNotice = document.querySelector('.unique-code-notice');
@@ -336,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (uniqueCodeNotice) uniqueCodeNotice.style.display = 'none';
         }
 
-        const totalToPay = parseInt(finalAmount) + uniqueCode;
+        const totalToPay = finalAmount + uniqueCode;
         const formattedAmount = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
