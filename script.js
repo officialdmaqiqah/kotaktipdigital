@@ -226,8 +226,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnConfirmPayment.addEventListener('click', async () => {
             if (!currentTransaction) return;
 
+            const { name, description, formattedAmount, method, amount } = currentTransaction;
             const userWa = formatPhoneNumber(waNumberInput.value.trim());
-            const description = descriptionInput.value.trim();
             
             // 1. Save to Supabase History FIRST
             await saveToCloudHistory({
