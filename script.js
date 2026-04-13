@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { name, description, formattedAmount, method, amount } = currentTransaction;
             const userWa = formatPhoneNumber(waNumberInput.value.trim());
 
-            const message = `Assalamualaikum,\nSaya Bpk/Ibu *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
+            const message = `Assalamualaikum,\nSaya *${name}*\n\nSaya sudah melakukan transfer senilai *${formattedAmount}* melalui *${method}*\n\n*Keterangan/Produk :*\n${description}\n\nMohon dicek ya. Terima kasih!`;
             const finalNum = formatPhoneNumber(settings.waNumber);
             const waUrl = `https://wa.me/${finalNum}?text=${encodeURIComponent(message)}`;
 
